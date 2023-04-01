@@ -1,30 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Pracownicy
 {
-    enum JobTitles
+    public enum JobTitles
     {
-        DESIGNER, PROGRAMMMER, MANAGER
+        DESIGNER, PROGRAMMMER, MANAGER, UNKNOWN
     }
 
-    static class JobTitlesMethods
+    public class JobTitlesMethods
     {
-        public static String getString(JobTitles title)
+        private Dictionary<JobTitles, String> titleToStringPL = new Dictionary<JobTitles, string>();
+        private Dictionary<String, JobTitles> stringToTitlePL = new Dictionary<string, JobTitles>();
+        public JobTitlesMethods()
         {
-            switch (title)
-            {
-                case JobTitles.DESIGNER:
-                    return "Projektant";
-                case JobTitles.PROGRAMMMER:
-                    return "Programista";
-                case JobTitles.MANAGER:
-                    return "Menedzer";
+            titleToStringPL[JobTitles.DESIGNER] = "Projektant";
+            titleToStringPL[JobTitles.PROGRAMMMER] = "Programista";
+            titleToStringPL[JobTitles.MANAGER] = "Menedżer";
+
+            // create a reverse map
+            foreach (JobTitles title in titleToStringPL.Keys)
+                stringToTitlePL[titleToStringPL[title]] = title;
+            
+        }
+        public JobTitles fromString(String label)
+        {
+            if (stringToTitlePL.ContainsKey(label)) {
+                return stringToTitlePL[label];
+            }
+            return JobTitles.UNKNOWN;
+        }
+
+        public String getString(JobTitles title)
+        {
+            if (titleToStringPL.ContainsKey(title)) {
+                return titleToStringPL[title];
             }
             return "unknown";
-        } 
+        }
+
+        public String[] getAllStrings()
+        {
+            return this.stringToTitlePL.Keys.ToArray();
+        }
     }
 }
