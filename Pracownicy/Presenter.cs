@@ -20,15 +20,21 @@ namespace Pracownicy
 
         private List<Employee> _currentEmployees;
 
+        // Events for the View to subscribe to
+        public Action<List<Employee>> employeesListUpdated;
+        public Action<String> errorSet;
+        public Action errorUnset;
+
         public Presenter(View view, Model model)
         {
             this._view = view;
-            view._presenter = this;
-            AttachToViewEvents();
+            view.presenter = this;
+            SubscribeToViewEvents();
+
             this._model = model;
         }
 
-        private void AttachToViewEvents()
+        private void SubscribeToViewEvents()
         {
             this._view.nameChanged += OnNameChange;
             this._view.surnameChanged += OnSurnameChange;
@@ -74,11 +80,17 @@ namespace Pracownicy
                                                 _chosenSalary,
                                                 _chosenTitle,
                                                 _chosenContractType);
-            
-            this._model.AddEmmployee(newEmployee);
+            if (!this._model.isEmployeeValid(newEmployee))
+            {
+                this.errorSet.Invoke("Niepoprawne dane. Imię i nazwisko muszą składać się ze znaków alfabetycznych.");
+                return; 
+            }
+
+            this._model.AddEmployee(newEmployee);
             this._currentEmployees = this._model.GetEmployees();
-            // invoke event handled by the view
-            this._view.employeesListUpdated.Invoke(this._currentEmployees);
+            // invoke events handled by the view
+            this.employeesListUpdated.Invoke(this._currentEmployees);
+            this.errorUnset.Invoke();
         }
 
         private void OnLoadClicked(String path)
@@ -86,7 +98,7 @@ namespace Pracownicy
             this._model.LoadFromFile(path);
             this._currentEmployees = this._model.GetEmployees();
 
-            this._view.employeesListUpdated.Invoke(this._currentEmployees);
+            this.employeesListUpdated.Invoke(this._currentEmployees);
         }
 
         private void OnWriteClicked(String path)

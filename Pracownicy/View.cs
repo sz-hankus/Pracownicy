@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Pracownicy
 {
     public partial class View : Form
     {
-        public Presenter _presenter;
+        public Presenter presenter;
 
         public Action<String> nameChanged;
         public Action<String> surnameChanged;
@@ -23,7 +17,7 @@ namespace Pracownicy
         public Action<ContractTypes> contractTypeChanged;
         public Action addButtonClicked;
 
-        public Action<List<Employee>> employeesListUpdated;
+        
         public Action<String> loadButtonClicked;
         public Action<String> writeButtonClicked;
 
@@ -31,13 +25,29 @@ namespace Pracownicy
         {
             InitializeComponent();
             MyInitialize();
-            this.employeesListUpdated += OnUpdateEmployeesList;
+        }
+
+        public void SubscribeToPresenterEvents()
+        {
+            this.presenter.employeesListUpdated += this.OnUpdateEmployeesList;
+            this.presenter.errorSet += this.OnErrorSet;
+            this.presenter.errorUnset += this.OnErrorUnset;
         }
 
         private void OnUpdateEmployeesList(List<Employee> employees)
         {
             this.employeesListBox.Items.Clear();
             this.employeesListBox.Items.AddRange(employees.ToArray());
+        }
+
+        private void OnErrorSet(String message)
+        {
+            this.addButtonErrorProvider.SetError(this.addButton, message);
+        }
+
+        private void OnErrorUnset()
+        {
+            this.addButtonErrorProvider.Clear();
         }
 
         private void NameTextBox_TextChanged(object sender, EventArgs e)
@@ -71,6 +81,16 @@ namespace Pracownicy
             JobTitles title = new JobTitlesMethods().fromString(selected);
 
             this.jobTitleChanged.Invoke(title);
+        }
+
+        private void radioButton_Click(object sender, EventArgs e)
+        {
+            RadioButton rb = sender as RadioButton;
+            ContractTypes type = new ContractTypesMethods().fromString(rb.Text);
+            if (rb.Checked)
+            {
+                this.contractTypeChanged.Invoke(type);
+            }
         }
 
         private void AddButton_Click(object sender, EventArgs e)
@@ -110,24 +130,14 @@ namespace Pracownicy
             this.birthDatePicker.Value = selected.BirthDate;
             this.salaryPicker.Value = selected.Salary;
             this.jobTitlePicker.SelectedItem = new JobTitlesMethods().getString(selected.Title);
+            
+            String contract = new ContractTypesMethods().getString(selected.ContractType);
+            
+            foreach (RadioButton rBtn in this.panel1.Controls.OfType<RadioButton>())
+                if (rBtn.Text == contract)
+                    rBtn.Select();
+            
         }
 
-        private void radioButton_Click(object sender, EventArgs e)
-        {
-            RadioButton rb = sender as RadioButton;
-            ContractTypes type = new ContractTypesMethods().fromString(rb.Text);
-            if (rb.Checked)
-            {
-                this.contractTypeChanged.Invoke(type);
-            }
-        }
-
-        private void TextBox_Validating(object sender, CancelEventArgs e)
-        {
-            TextBox tb = sender as TextBox;
-
-            if (!tb.Text.All(Char.IsLetter))
-                e.Cancel = true;
-        }
     }
 }

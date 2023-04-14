@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Threading.Tasks;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Pracownicy
 {
@@ -15,7 +15,14 @@ namespace Pracownicy
             this._employees = new List<Employee>();
         }
 
-        public void AddEmmployee(Employee employee)
+        public bool isEmployeeValid(Employee employee)
+        {            
+            if (!employee.Name.All(Char.IsLetter) || !employee.Surname.All(Char.IsLetter))
+                return false;
+            return true;
+        }
+
+        public void AddEmployee(Employee employee)
         {
             this._employees.Add(employee);
         }
@@ -30,22 +37,47 @@ namespace Pracownicy
             return this._employees;
         }
 
-        public void LoadFromFile(String path)
+        public void WriteContentsToFile(String path)
         {
-            System.Xml.Serialization.XmlSerializer x = new System.Xml.Serialization.XmlSerializer(this._employees.GetType());
-            using (Stream inputFileStream = new FileStream(path, FileMode.Open))
-            {
-                this._employees = x.Deserialize(inputFileStream) as List<Employee>;
-            }
+            if (path.EndsWith(".json"))
+                JSONSerialize(path);
+            else
+                XMLSerialize(path);
         }
 
-        public void WriteContentsToFile(String path)
+        private void JSONSerialize(String path)
+        {
+            using (Stream outputFileStream = new FileStream(path, FileMode.Create))
+                System.Text.Json.JsonSerializer.Serialize(outputFileStream, this._employees);
+        }
+
+        private void XMLSerialize(String path)
         {
             System.Xml.Serialization.XmlSerializer x = new System.Xml.Serialization.XmlSerializer(this._employees.GetType());
             using (Stream outputFileStream = new FileStream(path, FileMode.Create))
-            {
                 x.Serialize(outputFileStream, this._employees);
-            }
         }
+
+        public void LoadFromFile(String path)
+        {
+            if (path.EndsWith(".json"))
+                this._employees = JSONDeserialize(path);
+            else
+                this._employees = XMLDeserialize(path);
+        }
+
+        private List<Employee> JSONDeserialize(String path)
+        {
+            using (Stream inputFileStream = new FileStream(path, FileMode.Open))
+                return System.Text.Json.JsonSerializer.Deserialize<List<Employee>>(inputFileStream);
+        }
+
+        private List<Employee> XMLDeserialize(String path)
+        {
+            System.Xml.Serialization.XmlSerializer x = new System.Xml.Serialization.XmlSerializer(this._employees.GetType());
+            using (Stream inputFileStream = new FileStream(path, FileMode.Open))
+                return x.Deserialize(inputFileStream) as List<Employee>;
+        }
+       
     }
 }

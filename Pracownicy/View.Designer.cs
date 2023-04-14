@@ -33,6 +33,7 @@ namespace Pracownicy
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.employeesListBox = new System.Windows.Forms.ListBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.addButton = new System.Windows.Forms.Button();
@@ -54,8 +55,10 @@ namespace Pracownicy
             this.inputFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.writeButton = new System.Windows.Forms.Button();
             this.outputFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.addButtonErrorProvider = new System.Windows.Forms.ErrorProvider(this.components);
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.salaryPicker)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.addButtonErrorProvider)).BeginInit();
             this.SuspendLayout();
             // 
             // employeesListBox
@@ -103,11 +106,12 @@ namespace Pracownicy
             // radioButton1
             // 
             this.radioButton1.AutoSize = true;
+            this.radioButton1.Checked = true;
             this.radioButton1.Location = new System.Drawing.Point(114, 224);
             this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(163, 17);
+            this.radioButton1.Size = new System.Drawing.Size(14, 13);
             this.radioButton1.TabIndex = 15;
-            this.radioButton1.Text = "Umowa na czas nieokreślony";
+            this.radioButton1.TabStop = true;
             this.radioButton1.UseVisualStyleBackColor = true;
             this.radioButton1.Click += new System.EventHandler(this.radioButton_Click);
             // 
@@ -116,22 +120,19 @@ namespace Pracownicy
             this.radioButton2.AutoSize = true;
             this.radioButton2.Location = new System.Drawing.Point(114, 247);
             this.radioButton2.Name = "radioButton2";
-            this.radioButton2.Size = new System.Drawing.Size(149, 17);
+            this.radioButton2.Size = new System.Drawing.Size(14, 13);
             this.radioButton2.TabIndex = 14;
-            this.radioButton2.Text = "Umowa na czas określony";
             this.radioButton2.UseVisualStyleBackColor = true;
             this.radioButton2.Click += new System.EventHandler(this.radioButton_Click);
             // 
             // radioButton3
             // 
             this.radioButton3.AutoSize = true;
-            this.radioButton3.Checked = true;
             this.radioButton3.Location = new System.Drawing.Point(115, 270);
             this.radioButton3.Name = "radioButton3";
-            this.radioButton3.Size = new System.Drawing.Size(112, 17);
+            this.radioButton3.Size = new System.Drawing.Size(14, 13);
             this.radioButton3.TabIndex = 13;
             this.radioButton3.TabStop = true;
-            this.radioButton3.Text = "Umowa o zlecenie";
             this.radioButton3.UseVisualStyleBackColor = true;
             this.radioButton3.Click += new System.EventHandler(this.radioButton_Click);
             // 
@@ -146,11 +147,9 @@ namespace Pracownicy
             // 
             // jobTitlePicker
             // 
+            this.jobTitlePicker.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.jobTitlePicker.FormattingEnabled = true;
-            this.jobTitlePicker.Items.AddRange(new object[] {
-            "Projektant",
-            "Programista",
-            "Menedżer"});
+            this.jobTitlePicker.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.jobTitlePicker.Location = new System.Drawing.Point(115, 172);
             this.jobTitlePicker.Name = "jobTitlePicker";
             this.jobTitlePicker.Size = new System.Drawing.Size(130, 21);
@@ -201,7 +200,7 @@ namespace Pracownicy
             this.birthDatePicker.Name = "birthDatePicker";
             this.birthDatePicker.Size = new System.Drawing.Size(96, 20);
             this.birthDatePicker.TabIndex = 5;
-            this.birthDatePicker.Value = new System.DateTime(2023, 3, 30, 14, 50, 13, 14);
+            this.birthDatePicker.Value = new System.DateTime(2023, 4, 13, 23, 24, 26, 0);
             this.birthDatePicker.ValueChanged += new System.EventHandler(this.BirthDatePicker_ValueChanged);
             // 
             // birthDateLabel
@@ -228,7 +227,6 @@ namespace Pracownicy
             this.nameTextBox.Size = new System.Drawing.Size(130, 20);
             this.nameTextBox.TabIndex = 2;
             this.nameTextBox.TextChanged += new System.EventHandler(this.NameTextBox_TextChanged);
-            this.nameTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.TextBox_Validating);
             // 
             // surnameLabel
             // 
@@ -268,6 +266,11 @@ namespace Pracownicy
             this.writeButton.UseVisualStyleBackColor = true;
             this.writeButton.Click += new System.EventHandler(this.WriteButton_Click);
             // 
+            // addButtonErrorProvider
+            // 
+            this.addButtonErrorProvider.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
+            this.addButtonErrorProvider.ContainerControl = this;
+            // 
             // View
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -282,12 +285,14 @@ namespace Pracownicy
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.salaryPicker)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.addButtonErrorProvider)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         private void MyInitialize()
         {
+            //this.birthDatePicker.Value = DateTime.Now;
             // Init items in job title picker
             String[] titlesStrings = new JobTitlesMethods().getAllStrings();
             this.jobTitlePicker.Items.AddRange(titlesStrings);
@@ -296,8 +301,8 @@ namespace Pracownicy
             // Init radio buttons
             String[] contractStrings = new ContractTypesMethods().getAllStrings();
             this.radioButton1.Text = contractStrings[0];
-            this.radioButton1.Text = contractStrings[1];
-            this.radioButton1.Text = contractStrings[2];
+            this.radioButton2.Text = contractStrings[1];
+            this.radioButton3.Text = contractStrings[2];
         }
 
         #endregion
@@ -323,6 +328,7 @@ namespace Pracownicy
         private System.Windows.Forms.OpenFileDialog inputFileDialog;
         private System.Windows.Forms.Button writeButton;
         private System.Windows.Forms.SaveFileDialog outputFileDialog;
+        private ErrorProvider addButtonErrorProvider;
     }
 }
 

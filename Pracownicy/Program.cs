@@ -20,6 +20,7 @@ namespace Pracownicy
             View view = new View();
             Model model = new Model();
             Presenter presenter = new Presenter(view, model);
+            view.SubscribeToPresenterEvents();
             Application.Run(view);
         }
     }
